@@ -1,0 +1,25 @@
+{
+  "module_id": "OPTION-001",
+  "strategy_type": "0DTE_OPTIONS",
+  "symbols": [
+    "NVDA",
+    "GOOGL",
+    "AAPL",
+    "MSFT",
+    "AMZN",
+    "META",
+    "AVGO",
+    "TSLA",
+    "XSP",
+    "MRUT",
+    "MBTX",
+    "DJX"
+  ],
+  "max_loss_per_trade": "100.00",
+  "max_daily_defined_loss": "200.00",
+  "max_daily_entries": 2,
+  "entry_start": "09:45",
+  "entry_end": "10:30",
+  "mandatory_exit": "15:30",
+  "enabled_strategy_types": ["0DTE_OPTIONS"]
+}
