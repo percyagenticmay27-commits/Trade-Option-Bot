@@ -139,6 +139,8 @@ class TradeCandidate:
     underlying_symbol: str
     legs: tuple[OptionLeg, ...]
     product: ProductMetadata
+    net_credit: Money | None = None
+    operating_mode: OperatingMode = OperatingMode.PAPER
 
     def __post_init__(self) -> None:
         if not self.candidate_id or not self.underlying_symbol:
@@ -150,6 +152,8 @@ class TradeCandidate:
             raise ValueError("all option legs must use the same expiration")
         if self.product.symbol != self.underlying_symbol:
             raise ValueError("candidate product must match underlying")
+        if self.net_credit is not None and self.net_credit.amount <= 0:
+            raise ValueError("candidate net credit must be positive")
 
 
 @dataclass(frozen=True)
