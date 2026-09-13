@@ -1,0 +1,15 @@
+{
+  "version": "evidence-model-v1",
+  "weights": {
+    "vwap": 20,
+    "ema": 20,
+    "structure": 20,
+    "adx": 10,
+    "relative_volume": 10,
+    "market_alignment": 20
+  },
+  "trade_threshold": 75,
+  "watch_threshold": 55,
+  "neutral_adx_max": 20,
+  "neutral_chop_min": 55
+}
