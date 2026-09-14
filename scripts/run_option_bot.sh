@@ -9,7 +9,7 @@ if (( $# )); then
 fi
 
 case "$COMMAND" in
-  coverage-once|scan-once|manage-once|close-all-paper|render-reports|health) ;;
+  coverage-once|events-once|scan-once|manage-once|close-all-paper|render-reports|health) ;;
   *) echo "CONFIG_UNAVAILABLE: unsupported option bot command" >&2; exit 64 ;;
 esac
 

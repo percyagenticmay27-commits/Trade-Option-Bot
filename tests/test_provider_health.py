@@ -91,3 +91,40 @@ def test_coverage_once_writes_governed_read_only_report(monkeypatch, tmp_path, c
     assert len(payload["symbols"]) == 12
     assert payload["order_submission_enabled"] is False
     assert "12 governed symbols" in capsys.readouterr().out
+
+
+def test_events_once_writes_fail_closed_source_attributed_report(
+    monkeypatch, tmp_path, capsys
+) -> None:
+    env = environment() | {"ALPHA_VANTAGE_API_KEY": "alpha-secret"}
+
+    class Client:
+        def get_json(self, url):
+            assert "alpha-secret" in url
+            return {"feed": []}
+
+        def get_bytes(self, url):
+            return b"<rss><channel/></rss>"
+
+    monkeypatch.setattr("option_bot.cli.os.environ", env)
+    monkeypatch.setattr("option_bot.cli.PublicHttpClient", Client)
+
+    assert main([
+        "events-once", "--config", str(CONFIG), "--output-dir", str(tmp_path)
+    ]) == 0
+    payload = json.loads((tmp_path / "option_001_events.json").read_text())
+    assert payload["event_gate"] == "BLOCKED"
+    assert payload["order_submission_enabled"] is False
+    assert len(payload["symbols"]) == 12
+    assert "alpha-secret" not in json.dumps(payload)
+    assert "12 governed symbols" in capsys.readouterr().out
+
+
+def test_events_once_requires_alpha_vantage_key(monkeypatch, tmp_path, capsys) -> None:
+    monkeypatch.setattr("option_bot.cli.os.environ", environment())
+    assert main([
+        "events-once", "--config", str(CONFIG), "--output-dir", str(tmp_path)
+    ]) == 2
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == "DATA_UNAVAILABLE"
+    assert not (tmp_path / "option_001_events.json").exists()

@@ -7,14 +7,16 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote_plus
 from zoneinfo import ZoneInfo
 
 from option_bot.config import ConfigError, OptionBotConfig
 from option_bot.coverage import build_coverage_report
-from option_bot.providers.http import build_json_transport
+from option_bot.event_intelligence import AlphaVantageNewsSource, RssNewsSource, build_event_intelligence_report
+from option_bot.providers.http import PublicHttpClient, build_json_transport
 
 
-COMMANDS = ("health", "coverage-once", "scan-once", "manage-once", "close-all-paper", "render-reports")
+COMMANDS = ("health", "coverage-once", "events-once", "scan-once", "manage-once", "close-all-paper", "render-reports")
 DATA_BASE_URL = "https://data.alpaca.markets"
 ET = ZoneInfo("America/New_York")
 
@@ -105,6 +107,40 @@ def main(argv: list[str] | None = None) -> int:
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
             print(f"OPTION-001 coverage written for {len(config.symbols)} governed symbols: {output}")
+            return 0
+        except (ConfigError, OSError, ValueError, json.JSONDecodeError) as exc:
+            print(json.dumps({"status": "DATA_UNAVAILABLE", "paper_only": True, "detail": str(exc)}, sort_keys=True))
+            return 2
+    if command == "events-once":
+        try:
+            config = OptionBotConfig.load(os.environ, Path(args.config))
+            alpha_key = os.environ.get("ALPHA_VANTAGE_API_KEY", "")
+            if not alpha_key:
+                raise ConfigError("ALPHA_VANTAGE_API_KEY is required for event intelligence")
+            client = PublicHttpClient()
+            sources = (
+                AlphaVantageNewsSource(alpha_key, client.get_json),
+                RssNewsSource(
+                    "YAHOO_FINANCE",
+                    lambda symbol: f"https://finance.yahoo.com/rss/headline?s={quote_plus(symbol)}",
+                    client.get_bytes,
+                ),
+                RssNewsSource(
+                    "GOOGLE_NEWS",
+                    lambda symbol: (
+                        "https://news.google.com/rss/search?"
+                        f"q={quote_plus(symbol + ' stock')}&hl=en-US&gl=US&ceid=US:en"
+                    ),
+                    client.get_bytes,
+                ),
+            )
+            report = build_event_intelligence_report(
+                symbols=config.symbols, sources=sources, retrieved_at=datetime.now(ET)
+            )
+            output = Path(args.output_dir) / "option_001_events.json"
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            print(f"OPTION-001 event intelligence written for {len(config.symbols)} governed symbols: {output}")
             return 0
         except (ConfigError, OSError, ValueError, json.JSONDecodeError) as exc:
             print(json.dumps({"status": "DATA_UNAVAILABLE", "paper_only": True, "detail": str(exc)}, sort_keys=True))

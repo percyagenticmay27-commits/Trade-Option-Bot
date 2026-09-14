@@ -64,3 +64,21 @@ class JsonHttpTransport:
 
 def build_json_transport(base_url: str, key_id: str, secret_key: str) -> JsonHttpTransport:
     return JsonHttpTransport(base_url, key_id, secret_key)
+
+
+class PublicHttpClient:
+    """Small read-only client for public JSON and RSS sources."""
+
+    def __init__(self, *, opener: Callable[..., Any] = urlopen, timeout: float = 10.0) -> None:
+        self._opener = opener
+        self._timeout = timeout
+
+    def get_bytes(self, url: str) -> bytes:
+        if not url.startswith("https://"):
+            raise ValueError("public provider URL must use HTTPS")
+        request = Request(url, method="GET", headers={"Accept": "application/json, application/rss+xml"})
+        with self._opener(request, timeout=self._timeout) as response:
+            return response.read()
+
+    def get_json(self, url: str) -> Mapping[str, Any]:
+        return JsonHttpTransport._payload(self.get_bytes(url))

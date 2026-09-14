@@ -2,7 +2,7 @@ import io
 import json
 from urllib.error import HTTPError
 
-from option_bot.providers.http import JsonHttpTransport
+from option_bot.providers.http import JsonHttpTransport, PublicHttpClient
 
 
 class Response:
@@ -47,3 +47,22 @@ def test_http_error_returns_status_and_safe_json_payload() -> None:
         "https://data.alpaca.markets", "paper-key", "paper-secret", opener=opener
     )
     assert transport("GET", "/v2/stocks/snapshots", {}, None) == (403, {"message": "forbidden"})
+
+
+def test_public_client_allows_only_read_only_https() -> None:
+    captured = {}
+
+    def opener(request, timeout):
+        captured.update(method=request.method, url=request.full_url)
+        return Response(200, {"feed": []})
+
+    client = PublicHttpClient(opener=opener)
+    assert client.get_json("https://example.test/news") == {"feed": []}
+    assert captured == {"method": "GET", "url": "https://example.test/news"}
+
+    try:
+        client.get_bytes("http://example.test/news")
+    except ValueError as exc:
+        assert "HTTPS" in str(exc)
+    else:
+        raise AssertionError("non-HTTPS source was accepted")

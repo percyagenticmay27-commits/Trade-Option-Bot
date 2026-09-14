@@ -21,6 +21,7 @@ APCA_API_SECRET_KEY=<rotated-paper-secret-key>
 APCA_API_BASE_URL=https://paper-api.alpaca.markets
 OPTION_BOT_TIMEZONE=America/New_York
 OPTION_BOT_DB_PATH=/home/tradebot/Trade-Option-Bot/results/option_bot.sqlite3
+ALPHA_VANTAGE_API_KEY=<alpha-vantage-key>
 ```
 
 Never place credentials in the repository, shell history, unit files, screenshots, or reports. The environment file must be owned by root, readable by `tradebot`, and mode 600. A server administrator should review and run:

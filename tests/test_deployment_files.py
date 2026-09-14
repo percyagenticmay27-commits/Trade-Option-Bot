@@ -51,6 +51,6 @@ def test_dashboard_restarts_safely_and_deployment_is_paper_only() -> None:
 def test_script_has_overlap_protection_and_rejects_unknown_commands() -> None:
     script = (ROOT / "scripts/run_option_bot.sh").read_text()
     assert "flock -n" in script and "CONFIG_UNAVAILABLE" in script
-    assert "coverage-once|scan-once|manage-once|close-all-paper|render-reports|health" in script
+    assert "coverage-once|events-once|scan-once|manage-once|close-all-paper|render-reports|health" in script
     assert "shift" in script
     assert '"$@"' in script
