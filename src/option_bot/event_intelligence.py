@@ -10,6 +10,8 @@ from urllib.parse import urlencode
 from xml.etree import ElementTree
 from zoneinfo import ZoneInfo
 
+from option_bot.scheduled_events import OfficialCalendarSource, evaluate_scheduled_calendars
+
 
 ET = ZoneInfo("America/New_York")
 MAX_HEADLINE_AGE_MINUTES = 72 * 60
@@ -146,6 +148,7 @@ def build_event_intelligence_report(
     symbols: Sequence[str],
     sources: Sequence[NewsSource],
     retrieved_at: datetime,
+    scheduled_sources: Sequence[OfficialCalendarSource] = (),
 ) -> Mapping[str, Any]:
     if retrieved_at.tzinfo is None:
         raise ValueError("retrieved_at must be timezone-aware")
@@ -182,13 +185,16 @@ def build_event_intelligence_report(
                 "reason_codes": reasons,
             }
         )
+    scheduled = evaluate_scheduled_calendars(scheduled_sources, retrieved_at.astimezone(ET).date())
     return {
         "module_id": "OPTION-001",
         "paper_only": True,
         "order_submission_enabled": False,
         "retrieved_at_et": _iso_et(retrieved_at),
-        "event_gate": "BLOCKED",
-        "scheduled_calendar_status": "UNAVAILABLE",
-        "reason_codes": ["SCHEDULED_EVENT_GATE_UNAVAILABLE"],
+        "event_gate": scheduled["gate"],
+        "scheduled_calendar_status": scheduled["status"],
+        "scheduled_source_status": scheduled["source_status"],
+        "scheduled_events": scheduled["events"],
+        "reason_codes": scheduled["reason_codes"],
         "symbols": symbol_reports,
     }

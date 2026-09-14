@@ -6,6 +6,7 @@ from option_bot.event_intelligence import (
     RssNewsSource,
     build_event_intelligence_report,
 )
+from option_bot.scheduled_events import OfficialCalendarSource
 
 
 ET = ZoneInfo("America/New_York")
@@ -119,3 +120,15 @@ def test_stale_risk_headline_is_retained_but_cannot_block_today() -> None:
     assert symbol["headline_count"] == 1
     assert symbol["actionable_headline_count"] == 0
     assert symbol["headlines"][0]["freshness"] == "STALE"
+
+
+def test_all_official_calendars_must_clear_before_event_gate_clears() -> None:
+    calendar = OfficialCalendarSource(
+        "OFFICIAL_TEST", "https://official.test/calendar", lambda _: b"ok", lambda *_: []
+    )
+    report = build_event_intelligence_report(
+        symbols=("AAPL",), sources=(), retrieved_at=NOW, scheduled_sources=(calendar,)
+    )
+    assert report["scheduled_calendar_status"] == "AVAILABLE"
+    assert report["event_gate"] == "CLEAR"
+    assert report["scheduled_source_status"] == {"OFFICIAL_TEST": "AVAILABLE"}

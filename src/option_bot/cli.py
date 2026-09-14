@@ -14,6 +14,15 @@ from option_bot.config import ConfigError, OptionBotConfig
 from option_bot.coverage import build_coverage_report
 from option_bot.event_intelligence import AlphaVantageNewsSource, RssNewsSource, build_event_intelligence_report
 from option_bot.providers.http import PublicHttpClient, build_json_transport
+from option_bot.scheduled_events import (
+    BEA_URL,
+    BLS_URL,
+    FED_URL,
+    OfficialCalendarSource,
+    parse_bea_schedule,
+    parse_bls_ics,
+    parse_fomc_calendar,
+)
 
 
 COMMANDS = ("health", "coverage-once", "events-once", "scan-once", "manage-once", "close-all-paper", "render-reports")
@@ -135,7 +144,14 @@ def main(argv: list[str] | None = None) -> int:
                 ),
             )
             report = build_event_intelligence_report(
-                symbols=config.symbols, sources=sources, retrieved_at=datetime.now(ET)
+                symbols=config.symbols,
+                sources=sources,
+                retrieved_at=datetime.now(ET),
+                scheduled_sources=(
+                    OfficialCalendarSource("FEDERAL_RESERVE", FED_URL, client.get_bytes, parse_fomc_calendar),
+                    OfficialCalendarSource("BLS", BLS_URL, client.get_bytes, parse_bls_ics),
+                    OfficialCalendarSource("BEA", BEA_URL, client.get_bytes, parse_bea_schedule),
+                ),
             )
             output = Path(args.output_dir) / "option_001_events.json"
             output.parent.mkdir(parents=True, exist_ok=True)
