@@ -53,12 +53,14 @@ def test_public_client_allows_only_read_only_https() -> None:
     captured = {}
 
     def opener(request, timeout):
-        captured.update(method=request.method, url=request.full_url)
+        captured.update(method=request.method, url=request.full_url, headers=dict(request.header_items()))
         return Response(200, {"feed": []})
 
     client = PublicHttpClient(opener=opener)
     assert client.get_json("https://example.test/news") == {"feed": []}
-    assert captured == {"method": "GET", "url": "https://example.test/news"}
+    assert captured["method"] == "GET"
+    assert captured["url"] == "https://example.test/news"
+    assert captured["headers"]["User-agent"].startswith("Trade-Option-Bot/")
 
     try:
         client.get_bytes("http://example.test/news")

@@ -76,7 +76,14 @@ class PublicHttpClient:
     def get_bytes(self, url: str) -> bytes:
         if not url.startswith("https://"):
             raise ValueError("public provider URL must use HTTPS")
-        request = Request(url, method="GET", headers={"Accept": "application/json, application/rss+xml"})
+        request = Request(
+            url,
+            method="GET",
+            headers={
+                "Accept": "application/json, application/rss+xml, text/calendar, text/html",
+                "User-Agent": "Trade-Option-Bot/0.1 read-only event monitor",
+            },
+        )
         with self._opener(request, timeout=self._timeout) as response:
             return response.read()
 

@@ -92,6 +92,8 @@ Corrected server execution at 09:15 ET reported 123 passing tests. Freshness fil
 
 Official scheduled-calendar checkpoint: a new source-attributed calendar layer reads the Federal Reserve FOMC calendar, the BLS official ICS release calendar, and the BEA release schedule over read-only HTTPS. It validates source signatures before treating an empty date as clear, blocks every date in a multi-day FOMC meeting, normalizes timed BLS/BEA releases to ET, and requires every configured official source to succeed. Any fetch or parse failure returns `SCHEDULED_EVENT_GATE_UNAVAILABLE`; any same-day event returns `SCHEDULED_EVENT_TODAY`. Sixteen focused tests and 129 full-suite tests pass locally. Live server parsing remains the next proof gate.
 
+Initial server calendar execution at 09:26 ET reported BEA AVAILABLE but BLS and Federal Reserve UNAVAILABLE. Direct read-only diagnosis proved both sites returned HTTP 403 to Python's default request identity while accepting an explicit descriptive user agent (HTTP 200). `PublicHttpClient` now sends `Trade-Option-Bot/0.1 read-only event monitor` plus accepted JSON/RSS/calendar/HTML media types on GET requests. The focused regression first failed on the absent header and then passed; the full suite remains 129 passed. Server rerun is required.
+
 Remaining external decisions still fail closed: authoritative scheduled Fed/economic calendar coverage; live AI CIO repository/View-link registration path and dashboard host/port; unsupported Alpaca products MRUT/MBTX; configured paper-comparison fee schedule.
 
 ## Important Task 7 behavior
