@@ -3,7 +3,9 @@ Description=Invoke OPTION-001 scan cadence; application exchange-calendar gates 
 
 [Timer]
 OnCalendar=Mon..Fri *-*-* 09:45:00 America/New_York
-OnUnitActiveSec=5min
+OnCalendar=Mon..Fri *-*-* 10:00:00 America/New_York
+OnCalendar=Mon..Fri *-*-* 10:15:00 America/New_York
+OnCalendar=Mon..Fri *-*-* 10:30:00 America/New_York
 AccuracySec=5s
 Persistent=false
 Unit=trade-option-bot-scan.service
