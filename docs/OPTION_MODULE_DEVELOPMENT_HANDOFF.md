@@ -82,6 +82,8 @@ Read-only coverage checkpoint: `coverage-once` queries active contracts for the 
 
 First server coverage execution exposed a wrapper defect: `scripts/run_option_bot.sh` consumed the command name but discarded remaining CLI arguments, so an explicit `--trade-date 2026-09-14` was ignored and the report truthfully used the current ET date `2026-09-13` (Sunday). The wrapper now shifts only the command argument and forwards all remaining arguments. Alpaca also returned code `42210000`, `invalid underlying symbols`, for both `MRUT` and `MBTX`; coverage now reports these exact governed symbols as `UNSUPPORTED_UNDERLYING` with stable reason `ALPACA_INVALID_UNDERLYING` and never substitutes another product. Regression and full-suite verification pass with 114 tests. Rerun server coverage for 2026-09-14 after updating.
 
+Corrected server coverage for 2026-09-14 found active contracts for NVDA (138), GOOGL (60), AAPL (94), MSFT (100), AMZN (80), META (244), AVGO (104), TSLA (118), XSP (560), and DJX (148). Alpaca reported AMERICAN style for the eight equities and EUROPEAN for XSP/DJX, but omitted settlement type; MRUT and MBTX were confirmed unsupported. A versioned product registry now supplies only the absent settlement/product classification with explicit OIC/Cboe source URLs, retains the provider-reported null separately, and fails closed on any style conflict. Five focused coverage tests and 115 full-suite tests pass. Server rerun against this reconciliation remains pending.
+
 Remaining external decisions still fail closed: authoritative economic/company event provider; live AI CIO repository/View-link registration path and dashboard host/port; Alpaca same-day entitlement for XSP/MRUT/MBTX/DJX; configured paper-comparison fee schedule.
 
 ## Important Task 7 behavior
@@ -134,7 +136,7 @@ cd /workspace/scratch/cb8984e0c503/Trade-Option-Bot
 git status --short
 ```
 
-Expected at this checkpoint: 114 full-suite tests pass.
+Expected at this checkpoint: 115 full-suite tests pass.
 
 ## Git and safety notes
 

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Callable, Mapping, Sequence
 
+from option_bot.product_registry import product_metadata
+
 
 Transport = Callable[
     [str, str, Mapping[str, Any], Mapping[str, Any] | None],
@@ -49,6 +51,11 @@ def build_coverage_report(
             "contract_count": 0,
             "exercise_style": None,
             "settlement_type": None,
+            "product_type": None,
+            "provider_reported_exercise_style": None,
+            "provider_reported_settlement_type": None,
+            "settlement_source": None,
+            "metadata_source_url": None,
             "status": "DATA_UNAVAILABLE",
             "reason_codes": [],
         }
@@ -68,9 +75,28 @@ def build_coverage_report(
             rows.append({**base, "status": "NO_EXPIRATION_TODAY", "reason_codes": ["NO_ACTIVE_CONTRACTS"]})
             continue
         style = _metadata(contracts[0], "style")
-        settlement = _metadata(contracts[0], "settlement_type")
-        product = {**base, "contract_count": len(contracts), "exercise_style": style, "settlement_type": settlement}
-        if style is None or settlement is None:
+        provider_settlement = _metadata(contracts[0], "settlement_type")
+        reference = product_metadata(symbol)
+        reference_style = reference.get("exercise_style") if reference else None
+        settlement = provider_settlement or (reference.get("settlement_type") if reference else None)
+        product = {
+            **base,
+            "contract_count": len(contracts),
+            "exercise_style": style,
+            "settlement_type": settlement,
+            "product_type": reference.get("product_type") if reference else None,
+            "provider_reported_exercise_style": style,
+            "provider_reported_settlement_type": provider_settlement,
+            "settlement_source": (
+                "ALPACA_CONTRACT" if provider_settlement else
+                (reference.get("metadata_source") if reference else None)
+            ),
+            "metadata_source_url": reference.get("source_url") if reference else None,
+        }
+        if reference_style and style and reference_style != style:
+            rows.append({**product, "reason_codes": ["EXERCISE_STYLE_CONFLICT"]})
+            continue
+        if style is None or settlement is None or product["product_type"] is None:
             rows.append({**product, "reason_codes": ["PRODUCT_METADATA_INCOMPLETE"]})
             continue
         quote_status, _ = market_transport(

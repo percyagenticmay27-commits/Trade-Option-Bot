@@ -48,16 +48,38 @@ def test_coverage_reports_verified_contracts_and_fail_closed_reasons() -> None:
 
 def test_coverage_does_not_invent_missing_product_metadata() -> None:
     def paper(*_):
-        return 200, {"option_contracts": [{"symbol": "AAPL260914P00100000"}]}
+        return 200, {"option_contracts": [{"symbol": "UNKNOWN260914P00100000"}]}
 
     report = build_coverage_report(
-        symbols=("AAPL",), trade_date="2026-09-14",
+        symbols=("UNKNOWN",), trade_date="2026-09-14",
         paper_transport=paper, market_transport=lambda *_: (200, {"snapshots": {}}),
     )
     row = report["symbols"][0]
     assert row["status"] == "DATA_UNAVAILABLE"
     assert row["exercise_style"] is None and row["settlement_type"] is None
     assert "PRODUCT_METADATA_INCOMPLETE" in row["reason_codes"]
+
+
+def test_coverage_uses_attributed_governed_settlement_when_alpaca_omits_it() -> None:
+    def paper(method, path, params, body):
+        symbol = params["underlying_symbols"]
+        return 200, {"option_contracts": [{
+            "symbol": f"{symbol}260914P00100000",
+            "style": "american" if symbol == "AAPL" else "european",
+        }]}
+
+    report = build_coverage_report(
+        symbols=("AAPL", "XSP"), trade_date="2026-09-14",
+        paper_transport=paper, market_transport=lambda *_: (200, {"snapshots": {}}),
+    )
+    aapl, xsp = report["symbols"]
+    assert (aapl["settlement_type"], aapl["product_type"]) == ("PHYSICAL", "EQUITY_OPTION")
+    assert (xsp["settlement_type"], xsp["product_type"]) == ("CASH", "INDEX_OPTION")
+    assert aapl["provider_reported_settlement_type"] is None
+    assert xsp["provider_reported_settlement_type"] is None
+    assert aapl["settlement_source"] == "OIC_EQUITY_VS_INDEX_OPTIONS"
+    assert xsp["settlement_source"] == "CBOE_XSP_SPECIFICATION"
+    assert aapl["status"] == xsp["status"] == "AVAILABLE"
 
 
 def test_coverage_reports_contract_provider_failure_without_snapshot_call() -> None:
