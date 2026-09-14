@@ -80,6 +80,8 @@ Authenticated provider-health checkpoint: the user demonstrated HTTP 200 from th
 
 Read-only coverage checkpoint: `coverage-once` queries active contracts for the requested ET trade date separately for all 12 governed symbols, requests indicative same-day snapshots only when contracts exist and product metadata is present, writes `results/option_001_coverage.json`, and cannot submit an order. It distinguishes `NO_EXPIRATION_TODAY`, contracts HTTP failure, snapshot HTTP failure, and incomplete exercise/settlement metadata. Eleven focused tests and 113 full-suite tests pass. Server execution and inspection of the 12-symbol report remain pending. This still does not prove quote/Greek completeness or event coverage.
 
+First server coverage execution exposed a wrapper defect: `scripts/run_option_bot.sh` consumed the command name but discarded remaining CLI arguments, so an explicit `--trade-date 2026-09-14` was ignored and the report truthfully used the current ET date `2026-09-13` (Sunday). The wrapper now shifts only the command argument and forwards all remaining arguments. Alpaca also returned code `42210000`, `invalid underlying symbols`, for both `MRUT` and `MBTX`; coverage now reports these exact governed symbols as `UNSUPPORTED_UNDERLYING` with stable reason `ALPACA_INVALID_UNDERLYING` and never substitutes another product. Regression and full-suite verification pass with 114 tests. Rerun server coverage for 2026-09-14 after updating.
+
 Remaining external decisions still fail closed: authoritative economic/company event provider; live AI CIO repository/View-link registration path and dashboard host/port; Alpaca same-day entitlement for XSP/MRUT/MBTX/DJX; configured paper-comparison fee schedule.
 
 ## Important Task 7 behavior
@@ -132,7 +134,7 @@ cd /workspace/scratch/cb8984e0c503/Trade-Option-Bot
 git status --short
 ```
 
-Expected at this checkpoint: 113 full-suite tests pass.
+Expected at this checkpoint: 114 full-suite tests pass.
 
 ## Git and safety notes
 

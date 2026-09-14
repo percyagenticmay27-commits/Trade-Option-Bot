@@ -4,6 +4,9 @@ set -euo pipefail
 APP_ROOT=/home/tradebot/Trade-Option-Bot
 LOCK_FILE=/run/user/$(id -u)/trade-option-bot.lock
 COMMAND=${1:-health}
+if (( $# )); then
+  shift
+fi
 
 case "$COMMAND" in
   coverage-once|scan-once|manage-once|close-all-paper|render-reports|health) ;;
@@ -22,4 +25,4 @@ if ! flock -n 9; then
 fi
 
 cd "$APP_ROOT"
-exec "$APP_ROOT/.venv/bin/python" -m option_bot.cli "$COMMAND" --config "$APP_ROOT/configs/option-001.json"
+exec "$APP_ROOT/.venv/bin/python" -m option_bot.cli "$COMMAND" --config "$APP_ROOT/configs/option-001.json" "$@"

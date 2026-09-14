@@ -53,6 +53,14 @@ def build_coverage_report(
             "reason_codes": [],
         }
         if status != 200:
+            message = str(payload.get("message") or "").lower()
+            if status == 422 and "invalid underlying" in message:
+                rows.append({
+                    **base,
+                    "status": "UNSUPPORTED_UNDERLYING",
+                    "reason_codes": ["ALPACA_INVALID_UNDERLYING"],
+                })
+                continue
             rows.append({**base, "reason_codes": [f"CONTRACTS_HTTP_{status}"]})
             continue
         contracts = _contracts(payload)

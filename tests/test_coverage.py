@@ -69,3 +69,20 @@ def test_coverage_reports_contract_provider_failure_without_snapshot_call() -> N
     )
     assert report["symbols"][0]["reason_codes"] == ["CONTRACTS_HTTP_429"]
     assert snapshot_calls == []
+
+
+def test_invalid_underlying_is_reported_as_unsupported_without_substitution() -> None:
+    snapshot_calls = []
+    report = build_coverage_report(
+        symbols=("MRUT",), trade_date="2026-09-14",
+        paper_transport=lambda *_: (
+            422,
+            {"code": 42210000, "message": "invalid underlying symbols: MRUT"},
+        ),
+        market_transport=lambda *args: snapshot_calls.append(args),
+    )
+    row = report["symbols"][0]
+    assert row["symbol"] == "MRUT"
+    assert row["status"] == "UNSUPPORTED_UNDERLYING"
+    assert row["reason_codes"] == ["ALPACA_INVALID_UNDERLYING"]
+    assert snapshot_calls == []
