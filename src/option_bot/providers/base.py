@@ -18,6 +18,9 @@ class Availability(str, Enum):
 @dataclass(frozen=True)
 class NormalizedOptionContract:
     symbol: str
+    expiration: str
+    right: str
+    strike: str
     bid: str
     ask: str
     bid_size: int

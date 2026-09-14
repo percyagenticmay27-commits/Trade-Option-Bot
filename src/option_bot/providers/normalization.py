@@ -74,7 +74,9 @@ def normalize_option_surface(
                 last_trading_time="16:00",
             )
             normalized.append(NormalizedOptionContract(
-                symbol=str(raw["symbol"]), bid=str(bid), ask=str(ask),
+                symbol=str(raw["symbol"]), expiration=str(raw.get("expiration_date", expiration)),
+                right=str(raw.get("type", "")).upper(), strike=_decimal_string(raw.get("strike_price"), "strike"),
+                bid=str(bid), ask=str(ask),
                 bid_size=int(quote.get("bid_size", 0)), ask_size=int(quote.get("ask_size", 0)),
                 delta=required_greeks["delta"], gamma=required_greeks["gamma"],
                 theta=required_greeks["theta"], vega=required_greeks["vega"],

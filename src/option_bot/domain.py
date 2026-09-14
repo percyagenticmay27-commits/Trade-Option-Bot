@@ -141,6 +141,7 @@ class TradeCandidate:
     product: ProductMetadata
     net_credit: Money | None = None
     operating_mode: OperatingMode = OperatingMode.PAPER
+    structure_type: StructureType | None = None
 
     def __post_init__(self) -> None:
         if not self.candidate_id or not self.underlying_symbol:
