@@ -50,8 +50,9 @@ Wheel strategies are reserved for a later, separately governed `WHEEL_OPTIONS` e
 - Task 5 — structure enumeration, governed delta ladder, probability contracts, and expected-value delta optimizer
 - Task 6 — durable audit ledger, conservative fill model, and position lifecycle
 - Task 7 — deterministic daily orchestration, portfolio selection, and isolated shadow learning
+- Task 9 — read-only OPTION-001 AI CIO summary contract and View-link contract
 
-Current completion: **70% of the 10-task Version 1 implementation plan**.
+Current completion: **80% of the 10-task Version 1 implementation plan**. Tasks 1–7 and 9 are complete. Task 8 remains blocked only on browser render/interaction verification. Task 10 has not started.
 
 ## Current stopping point
 
@@ -62,6 +63,10 @@ Task 7 is complete. The focused Task 7 suite has 11 passing tests, the entire re
 Next action: run the frozen render checklist from `/workspace/scratch/cb8984e0c503/task8-ui-direction.md` in a browser-capable environment. Verify 375x812, 720x900, and 1280x800; keyboard-open an evidence details control; type `AAPL` in the labeled symbol filter and assert only AAPL remains; confirm no console errors or external requests. If those checks pass, run the focused and full Python suites, mark Task 8 complete in `progress.md`, update this handoff to 80%, commit, and sync GitHub. If the render exposes a defect, repair it before completing Task 8.
 
 The Task 8 implementation is preserved as an explicit checkpoint commit on the feature branch, but Task 8 is not marked complete because rendered verification has not passed.
+
+Task 9 is complete. The focused contract suite has 9 passing tests and the entire repository has 100 passing tests. The JSON schema is validated without an optional/skipped dependency. The contract is deterministic, contains no credential or account identifier fields, validates dashboard URLs, retains nullable unavailable values with blockers, and publishes fixed identity `OPTION-001` / `0DTE_OPTIONS` / version `1.0` / `paper_only: true`.
+
+After Task 8 browser verification, proceed to **Task 10: Package scheduling and deploy a supervised paper-only service**. Task 10 requires access to `ai-cio-platform`; do not simulate deployment locally or modify Swing/Dividend repositories.
 
 ## Important Task 7 behavior
 

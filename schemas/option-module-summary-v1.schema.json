@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "option-module-summary-v1.schema.json",
+  "title": "OPTION-001 AI CIO Summary Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version", "module_id", "strategy_type", "paper_only",
+    "timestamp_utc", "timestamp_et", "session_phase", "eligible_count",
+    "open_position_count", "realized_pnl", "open_pnl", "risk_used",
+    "risk_limit", "risk_remaining", "best_opportunity", "freshness",
+    "health", "blockers", "dashboard_url"
+  ],
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "module_id": {"const": "OPTION-001"},
+    "strategy_type": {"const": "0DTE_OPTIONS"},
+    "paper_only": {"const": true},
+    "timestamp_utc": {"type": "string", "format": "date-time"},
+    "timestamp_et": {"type": "string", "format": "date-time"},
+    "session_phase": {"type": "string", "minLength": 1},
+    "eligible_count": {"type": "integer", "minimum": 0},
+    "open_position_count": {"type": "integer", "minimum": 0},
+    "realized_pnl": {"type": ["string", "null"]},
+    "open_pnl": {"type": ["string", "null"]},
+    "risk_used": {"type": "string"},
+    "risk_limit": {"type": "string"},
+    "risk_remaining": {"type": "string"},
+    "best_opportunity": {"type": ["string", "null"]},
+    "freshness": {"type": "string", "minLength": 1},
+    "health": {"type": "string", "minLength": 1},
+    "blockers": {"type": "array", "items": {"type": "string"}},
+    "dashboard_url": {"type": "string", "minLength": 1}
+  }
+}
