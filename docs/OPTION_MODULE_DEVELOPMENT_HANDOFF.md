@@ -76,7 +76,9 @@ Dashboard discovery checkpoint supplied by the user: `dividend-allocation.servic
 
 **Critical server safety boundary:** `/home/tradebot/Trade-Dividend-Bot` is on `feature/dashboard-refresh-discovery-summary` at observed HEAD `30f481b` and has a very large dirty working tree with modified, staged, unstaged, and untracked files. Do not reset, checkout, restore, pull, clean, overwrite, regenerate, or broadly format that repository. Do not edit its registry until the exact publisher validation and portal-consumer contract have been read and a minimal, overlap-aware change is reviewed. Preserve all existing work.
 
-Authenticated provider-health checkpoint: the user demonstrated HTTP 200 from the Alpaca paper account endpoint, AAPL stock snapshot endpoint, and AAPL indicative option snapshot endpoint using protected server credentials. The repository now contains a standard-library authenticated JSON transport and `health` performs exactly those three GET checks. It reports `READY` only when all three return 200, returns nonzero otherwise, and does not expose credentials or response bodies. Four focused tests and 109 full-suite tests pass. This does not yet prove all 12 governed symbols, same-day expirations, quote completeness, or event coverage.
+Authenticated provider-health checkpoint: the user demonstrated HTTP 200 from the Alpaca paper account endpoint, AAPL stock snapshot endpoint, and AAPL indicative option snapshot endpoint using protected server credentials. The repository now contains a standard-library authenticated JSON transport and `health` performs exactly those three GET checks. It reports `READY` only when all three return 200, returns nonzero otherwise, and does not expose credentials or response bodies. The updated server health returned `provider_status=READY` with all three checks at 200.
+
+Read-only coverage checkpoint: `coverage-once` queries active contracts for the requested ET trade date separately for all 12 governed symbols, requests indicative same-day snapshots only when contracts exist and product metadata is present, writes `results/option_001_coverage.json`, and cannot submit an order. It distinguishes `NO_EXPIRATION_TODAY`, contracts HTTP failure, snapshot HTTP failure, and incomplete exercise/settlement metadata. Eleven focused tests and 113 full-suite tests pass. Server execution and inspection of the 12-symbol report remain pending. This still does not prove quote/Greek completeness or event coverage.
 
 Remaining external decisions still fail closed: authoritative economic/company event provider; live AI CIO repository/View-link registration path and dashboard host/port; Alpaca same-day entitlement for XSP/MRUT/MBTX/DJX; configured paper-comparison fee schedule.
 
@@ -130,7 +132,7 @@ cd /workspace/scratch/cb8984e0c503/Trade-Option-Bot
 git status --short
 ```
 
-Expected at this checkpoint: 109 full-suite tests pass.
+Expected at this checkpoint: 113 full-suite tests pass.
 
 ## Git and safety notes
 

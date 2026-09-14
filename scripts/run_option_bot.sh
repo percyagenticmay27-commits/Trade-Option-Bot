@@ -6,7 +6,7 @@ LOCK_FILE=/run/user/$(id -u)/trade-option-bot.lock
 COMMAND=${1:-health}
 
 case "$COMMAND" in
-  scan-once|manage-once|close-all-paper|render-reports|health) ;;
+  coverage-once|scan-once|manage-once|close-all-paper|render-reports|health) ;;
   *) echo "CONFIG_UNAVAILABLE: unsupported option bot command" >&2; exit 64 ;;
 esac
 

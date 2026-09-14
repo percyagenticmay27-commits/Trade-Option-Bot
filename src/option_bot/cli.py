@@ -5,14 +5,18 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from option_bot.config import ConfigError, OptionBotConfig
+from option_bot.coverage import build_coverage_report
 from option_bot.providers.http import build_json_transport
 
 
-COMMANDS = ("health", "scan-once", "manage-once", "close-all-paper", "render-reports")
+COMMANDS = ("health", "coverage-once", "scan-once", "manage-once", "close-all-paper", "render-reports")
 DATA_BASE_URL = "https://data.alpaca.markets"
+ET = ZoneInfo("America/New_York")
 
 
 def _provider_health(config: OptionBotConfig) -> tuple[str, dict[str, int | str]]:
@@ -47,6 +51,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="option-bot")
     parser.add_argument("command", nargs="?", choices=COMMANDS, default="health")
     parser.add_argument("--fixture-date")
+    parser.add_argument("--trade-date")
     parser.add_argument("--output-dir", default="results")
     parser.add_argument("--config", default="configs/option-001.json")
     return parser
@@ -80,6 +85,30 @@ def main(argv: list[str] | None = None) -> int:
         ReportBuilder(Path(args.output_dir)).build(args.fixture_date)
         print(f"OPTION-001 paper reports rendered to {args.output_dir}")
         return 0
+    if command == "coverage-once":
+        try:
+            config = OptionBotConfig.load(os.environ, Path(args.config))
+            trade_date = args.trade_date or datetime.now(ET).date().isoformat()
+            paper = build_json_transport(
+                config.alpaca_base_url, config.alpaca_key_id, config.alpaca_secret_key
+            )
+            market = build_json_transport(
+                DATA_BASE_URL, config.alpaca_key_id, config.alpaca_secret_key
+            )
+            report = build_coverage_report(
+                symbols=config.symbols,
+                trade_date=trade_date,
+                paper_transport=paper,
+                market_transport=market,
+            )
+            output = Path(args.output_dir) / "option_001_coverage.json"
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            print(f"OPTION-001 coverage written for {len(config.symbols)} governed symbols: {output}")
+            return 0
+        except (ConfigError, OSError, ValueError, json.JSONDecodeError) as exc:
+            print(json.dumps({"status": "DATA_UNAVAILABLE", "paper_only": True, "detail": str(exc)}, sort_keys=True))
+            return 2
     print(f"{command}: requires configured paper-only runtime")
     return 2
 
