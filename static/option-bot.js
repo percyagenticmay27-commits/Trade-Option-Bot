@@ -1,0 +1,1 @@
+(function(){const input=document.querySelector('[data-symbol-filter]');if(!input)return;input.addEventListener('input',function(){const query=input.value.trim().toUpperCase();document.querySelectorAll('[data-symbol-row]').forEach(function(row){row.hidden=query!==''&&!row.dataset.symbolRow.includes(query);});});})();

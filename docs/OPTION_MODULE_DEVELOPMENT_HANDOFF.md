@@ -57,7 +57,11 @@ Current completion: **70% of the 10-task Version 1 implementation plan**.
 
 Task 7 is complete. The focused Task 7 suite has 11 passing tests, the entire repository has 86 passing tests, and `git diff --check` passes.
 
-The next work item is **Task 8: Build reports and the standalone executive dashboard**. Start by reading the Task 8 section of the implementation plan. Add its failing tests before production code.
+**Task 8 is in progress and blocked only on browser-based rendered verification.** The JSON-first report builder, standalone dashboard renderer, template, CSS, client-only symbol filter, CLI report generation, five focused tests, and five generated artifact types are implemented. The exact CLI command succeeds after editable installation. A render capture was attempted at 375px, 720px, and 1280px, but the provided capture tool reported: `No installed Chrome, Chromium, or Edge executable was found.` Do not claim visual, interaction, console-error, or responsive verification until a browser-capable environment runs those checks.
+
+Next action: run the frozen render checklist from `/workspace/scratch/cb8984e0c503/task8-ui-direction.md` in a browser-capable environment. Verify 375x812, 720x900, and 1280x800; keyboard-open an evidence details control; type `AAPL` in the labeled symbol filter and assert only AAPL remains; confirm no console errors or external requests. If those checks pass, run the focused and full Python suites, mark Task 8 complete in `progress.md`, update this handoff to 80%, commit, and sync GitHub. If the render exposes a defect, repair it before completing Task 8.
+
+The Task 8 implementation is preserved as an explicit checkpoint commit on the feature branch, but Task 8 is not marked complete because rendered verification has not passed.
 
 ## Important Task 7 behavior
 
