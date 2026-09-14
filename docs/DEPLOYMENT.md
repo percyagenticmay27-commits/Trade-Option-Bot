@@ -16,6 +16,8 @@ python3 -m venv .venv
 Create `/etc/trade-option-bot.env` with the paper credentials and these fixed values:
 
 ```text
+APCA_API_KEY_ID=<rotated-paper-key-id>
+APCA_API_SECRET_KEY=<rotated-paper-secret-key>
 APCA_API_BASE_URL=https://paper-api.alpaca.markets
 OPTION_BOT_TIMEZONE=America/New_York
 OPTION_BOT_DB_PATH=/home/tradebot/Trade-Option-Bot/results/option_bot.sqlite3
@@ -25,8 +27,12 @@ Never place credentials in the repository, shell history, unit files, screenshot
 
 ```bash
 sudo chown root:tradebot /etc/trade-option-bot.env
-sudo chmod 600 /etc/trade-option-bot.env
+sudo chmod 640 /etc/trade-option-bot.env
 ```
+
+Mode `0640` is required: root retains write authority while the `tradebot`
+group can read the file for services that run as `User=tradebot`. Mode `0600`
+with owner `root` would make the environment unreadable to those services.
 
 Run migrations by starting read-only health, then generate an order-disabled dry run. Do not enable paper submission until the health report, all 12 symbol coverage results, dashboard, AI CIO contract, and candidate/rejection ledger have been reviewed.
 

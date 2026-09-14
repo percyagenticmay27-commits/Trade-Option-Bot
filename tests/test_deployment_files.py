@@ -43,7 +43,9 @@ def test_dashboard_restarts_safely_and_deployment_is_paper_only() -> None:
     assert "Restart=on-failure" in dashboard
     deployment = (ROOT / "docs/DEPLOYMENT.md").read_text()
     assert "https://paper-api.alpaca.markets" in deployment
-    assert "chmod 600" in deployment and "rollback" in deployment.lower()
+    # A root-owned environment file with group tradebot must retain group-read.
+    # Mode 600 would make operational services running as tradebot fail closed.
+    assert "chmod 640" in deployment and "rollback" in deployment.lower()
 
 
 def test_script_has_overlap_protection_and_rejects_unknown_commands() -> None:

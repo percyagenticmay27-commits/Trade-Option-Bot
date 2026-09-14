@@ -52,7 +52,7 @@ Wheel strategies are reserved for a later, separately governed `WHEEL_OPTIONS` e
 - Task 7 — deterministic daily orchestration, portfolio selection, and isolated shadow learning
 - Task 9 — read-only OPTION-001 AI CIO summary contract and View-link contract
 
-Formal completion remains **80% of the 10-task Version 1 implementation plan**. Estimated implementation progress is **90%**. Tasks 1–7 and 9 are complete. Task 8 remains blocked only on browser render/interaction verification. Task 10 repository packaging is implemented and locally verified, but Task 10 remains incomplete until supervised server deployment and the user's dry-run review.
+Formal completion remains **80% of the 10-task Version 1 implementation plan**. Estimated implementation progress is **91%**. Tasks 1–7 and 9 are complete. Task 8 remains blocked only on browser render/interaction verification. Task 10 repository packaging is implemented, locally verified, and now installed on the target server, but Task 10 remains incomplete until dashboard integration discovery, protected configuration health checks, product-coverage validation, and the user's order-disabled dry-run review.
 
 ## Current stopping point
 
@@ -68,7 +68,13 @@ Task 9 is complete. The focused contract suite has 9 passing tests and the entir
 
 Task 10 repository packaging checkpoint is complete: runner script, three one-shot operational services, three timers, read-only dashboard service, deployment/operations documentation, and fail-closed health output are implemented. Five focused deployment tests and 105 full-suite tests pass. `bash -n` passes. The exact health command returns nonzero `CONFIG_UNAVAILABLE` without deployment credentials. No live Alpaca URL or embedded credential assignment exists in the deployment files.
 
-Task 10 remains incomplete because `ai-cio-platform` is unavailable in this session. When server access is provided, work as `tradebot`: clone/check out the reviewed GitHub branch into `/home/tradebot/Trade-Option-Bot`, create `.venv`, install, run all tests, configure the protected paper environment, run health and an order-disabled dry run, validate all 12 product-coverage results, dashboard, and AI CIO JSON. If root/systemd commands are needed, stop and give the user the exact reviewed `sudo` commands. Do not enable paper submission until the user explicitly approves the dry-run evidence.
+Target-server checkpoint supplied by the user on 2026-09-13 CDT: GitHub CLI authentication succeeded as `percyagenticmay27-commits`; branch `feature/option-001-foundation` was cloned into `/home/tradebot/Trade-Option-Bot`; server HEAD is `af54018`; editable development installation succeeded; and the full suite reported `105 passed in 1.29s`. The protected environment file exists at `/etc/trade-option-bot/option-bot.env` with owner/group `tradebot:tradebot` and mode `0640`. Never print that file or its values. An Alpaca key was exposed in chat and must be revoked/rotated before any API health check.
+
+Task 10 remains incomplete. The next read-only server action is to identify the process listening on `127.0.0.1:8091`, inspect its service/cwd/command line, and locate the authoritative active AI CIO dashboard/registry implementation rather than relying on backup artifacts. Then review the Option Bot's proposed dashboard service port for conflicts, configure the authoritative View link, run health, and run an order-disabled dry run. Validate all 12 product-coverage results, dashboard output, and AI CIO JSON. If root/systemd commands are needed, stop and give the user exact reviewed `sudo` commands. Do not enable paper submission until the user explicitly approves the dry-run evidence.
+
+Dashboard discovery checkpoint supplied by the user: `dividend-allocation.service` runs `/home/tradebot/Trade-Dividend-Bot/paper_capital_allocation_server.py` as `tradebot` from `/home/tradebot/Trade-Dividend-Bot` and listens on `127.0.0.1:8091`; both `/` and `/strategy-review` return HTTP 200. The proposed Option Bot static dashboard uses port `8765`, so no listener conflict was observed. The authoritative source registry is `/home/tradebot/Trade-Dividend-Bot/config/enterprise_strategy_registry.json`; it currently declares only `DIVIDEND-001` and `SWING-001`. The approved Option Bot identity remains singular `OPTION-001`; a test fixture mentioning `OPTIONS-001` is not authority and must not silently rename the module.
+
+**Critical server safety boundary:** `/home/tradebot/Trade-Dividend-Bot` is on `feature/dashboard-refresh-discovery-summary` at observed HEAD `30f481b` and has a very large dirty working tree with modified, staged, unstaged, and untracked files. Do not reset, checkout, restore, pull, clean, overwrite, regenerate, or broadly format that repository. Do not edit its registry until the exact publisher validation and portal-consumer contract have been read and a minimal, overlap-aware change is reviewed. Preserve all existing work.
 
 Remaining external decisions still fail closed: authoritative economic/company event provider; live AI CIO repository/View-link registration path and dashboard host/port; Alpaca same-day entitlement for XSP/MRUT/MBTX/DJX; configured paper-comparison fee schedule.
 
@@ -122,7 +128,7 @@ cd /workspace/scratch/cb8984e0c503/Trade-Option-Bot
 git status --short
 ```
 
-Expected at this checkpoint: 11 focused tests and 86 full-suite tests pass.
+Expected at this checkpoint: 105 full-suite tests pass.
 
 ## Git and safety notes
 
