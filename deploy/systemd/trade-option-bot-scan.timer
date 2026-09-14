@@ -1,0 +1,12 @@
+[Unit]
+Description=Invoke OPTION-001 scan cadence; application exchange-calendar gates remain authoritative
+
+[Timer]
+OnCalendar=Mon..Fri *-*-* 09:45:00 America/New_York
+OnUnitActiveSec=5min
+AccuracySec=5s
+Persistent=false
+Unit=trade-option-bot-scan.service
+
+[Install]
+WantedBy=timers.target

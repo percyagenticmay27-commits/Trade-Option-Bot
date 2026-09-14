@@ -1,0 +1,13 @@
+[Unit]
+Description=OPTION-001 mandatory paper close enforcement
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=tradebot
+Group=tradebot
+WorkingDirectory=/home/tradebot/Trade-Option-Bot
+EnvironmentFile=/etc/trade-option-bot.env
+ExecStart=/home/tradebot/Trade-Option-Bot/scripts/run_option_bot.sh close-all-paper
+NoNewPrivileges=true
+PrivateTmp=true

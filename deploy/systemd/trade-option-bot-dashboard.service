@@ -1,0 +1,17 @@
+[Unit]
+Description=OPTION-001 standalone read-only dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=tradebot
+Group=tradebot
+WorkingDirectory=/home/tradebot/Trade-Option-Bot
+ExecStart=/home/tradebot/Trade-Option-Bot/.venv/bin/python -m http.server 8765 --directory /home/tradebot/Trade-Option-Bot/results
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

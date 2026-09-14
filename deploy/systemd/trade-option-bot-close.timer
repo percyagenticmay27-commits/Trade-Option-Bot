@@ -1,0 +1,11 @@
+[Unit]
+Description=OPTION-001 pre-close paper exit enforcement
+
+[Timer]
+OnCalendar=Mon..Fri *-*-* 15:25:00 America/New_York
+AccuracySec=5s
+Persistent=false
+Unit=trade-option-bot-close.service
+
+[Install]
+WantedBy=timers.target

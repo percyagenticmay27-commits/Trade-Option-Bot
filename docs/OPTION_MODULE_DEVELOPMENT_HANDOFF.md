@@ -52,7 +52,7 @@ Wheel strategies are reserved for a later, separately governed `WHEEL_OPTIONS` e
 - Task 7 — deterministic daily orchestration, portfolio selection, and isolated shadow learning
 - Task 9 — read-only OPTION-001 AI CIO summary contract and View-link contract
 
-Current completion: **80% of the 10-task Version 1 implementation plan**. Tasks 1–7 and 9 are complete. Task 8 remains blocked only on browser render/interaction verification. Task 10 has not started.
+Formal completion remains **80% of the 10-task Version 1 implementation plan**. Estimated implementation progress is **90%**. Tasks 1–7 and 9 are complete. Task 8 remains blocked only on browser render/interaction verification. Task 10 repository packaging is implemented and locally verified, but Task 10 remains incomplete until supervised server deployment and the user's dry-run review.
 
 ## Current stopping point
 
@@ -66,7 +66,11 @@ The Task 8 implementation is preserved as an explicit checkpoint commit on the f
 
 Task 9 is complete. The focused contract suite has 9 passing tests and the entire repository has 100 passing tests. The JSON schema is validated without an optional/skipped dependency. The contract is deterministic, contains no credential or account identifier fields, validates dashboard URLs, retains nullable unavailable values with blockers, and publishes fixed identity `OPTION-001` / `0DTE_OPTIONS` / version `1.0` / `paper_only: true`.
 
-After Task 8 browser verification, proceed to **Task 10: Package scheduling and deploy a supervised paper-only service**. Task 10 requires access to `ai-cio-platform`; do not simulate deployment locally or modify Swing/Dividend repositories.
+Task 10 repository packaging checkpoint is complete: runner script, three one-shot operational services, three timers, read-only dashboard service, deployment/operations documentation, and fail-closed health output are implemented. Five focused deployment tests and 105 full-suite tests pass. `bash -n` passes. The exact health command returns nonzero `CONFIG_UNAVAILABLE` without deployment credentials. No live Alpaca URL or embedded credential assignment exists in the deployment files.
+
+Task 10 remains incomplete because `ai-cio-platform` is unavailable in this session. When server access is provided, work as `tradebot`: clone/check out the reviewed GitHub branch into `/home/tradebot/Trade-Option-Bot`, create `.venv`, install, run all tests, configure the protected paper environment, run health and an order-disabled dry run, validate all 12 product-coverage results, dashboard, and AI CIO JSON. If root/systemd commands are needed, stop and give the user the exact reviewed `sudo` commands. Do not enable paper submission until the user explicitly approves the dry-run evidence.
+
+Remaining external decisions still fail closed: authoritative economic/company event provider; live AI CIO repository/View-link registration path and dashboard host/port; Alpaca same-day entitlement for XSP/MRUT/MBTX/DJX; configured paper-comparison fee schedule.
 
 ## Important Task 7 behavior
 

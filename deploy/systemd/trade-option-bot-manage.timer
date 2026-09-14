@@ -1,0 +1,12 @@
+[Unit]
+Description=Invoke OPTION-001 management cadence; application exchange-calendar gates remain authoritative
+
+[Timer]
+OnCalendar=Mon..Fri *-*-* 10:31:00 America/New_York
+OnUnitActiveSec=2min
+AccuracySec=5s
+Persistent=false
+Unit=trade-option-bot-manage.service
+
+[Install]
+WantedBy=timers.target
