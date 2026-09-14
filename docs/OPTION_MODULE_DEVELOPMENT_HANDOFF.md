@@ -52,7 +52,7 @@ Wheel strategies are reserved for a later, separately governed `WHEEL_OPTIONS` e
 - Task 7 — deterministic daily orchestration, portfolio selection, and isolated shadow learning
 - Task 9 — read-only OPTION-001 AI CIO summary contract and View-link contract
 
-Formal completion remains **80% of the 10-task Version 1 implementation plan**. Estimated full-goal progress is **90%**. Tasks 1–7 and 9 are complete. Task 8 remains blocked only on browser render/interaction verification. Task 10 repository packaging, authenticated provider health, 12-symbol product coverage, and corrected headline freshness are server-verified. Task 10 remains incomplete until live verification of authoritative scheduled-event coverage, dashboard registration, and the user's order-disabled dry-run review.
+Formal completion remains **80% of the 10-task Version 1 implementation plan**. Estimated full-goal progress is **92%**. Tasks 1–7 and 9 are complete. Task 8 remains blocked only on browser render/interaction verification. Task 10 repository packaging, authenticated provider health, 12-symbol product coverage, corrected headline freshness, and authoritative scheduled-event coverage are server-verified. Task 10 remains incomplete until dashboard registration and the user's complete order-disabled dry-run review.
 
 ## Current stopping point
 
@@ -93,6 +93,8 @@ Corrected server execution at 09:15 ET reported 123 passing tests. Freshness fil
 Official scheduled-calendar checkpoint: a new source-attributed calendar layer reads the Federal Reserve FOMC calendar, the BLS official ICS release calendar, and the BEA release schedule over read-only HTTPS. It validates source signatures before treating an empty date as clear, blocks every date in a multi-day FOMC meeting, normalizes timed BLS/BEA releases to ET, and requires every configured official source to succeed. Any fetch or parse failure returns `SCHEDULED_EVENT_GATE_UNAVAILABLE`; any same-day event returns `SCHEDULED_EVENT_TODAY`. Sixteen focused tests and 129 full-suite tests pass locally. Live server parsing remains the next proof gate.
 
 Initial server calendar execution at 09:26 ET reported BEA AVAILABLE but BLS and Federal Reserve UNAVAILABLE. Direct read-only diagnosis proved both sites returned HTTP 403 to Python's default request identity while accepting an explicit descriptive user agent (HTTP 200). `PublicHttpClient` now sends `Trade-Option-Bot/0.1 read-only event monitor` plus accepted JSON/RSS/calendar/HTML media types on GET requests. The focused regression first failed on the absent header and then passed; the full suite remains 129 passed. Server rerun is required.
+
+Verified server calendar execution at 09:29 ET on `b40ae2e`: all 129 tests passed; Federal Reserve, BLS, and BEA each reported AVAILABLE; no same-day scheduled events were found for 2026-09-14; `scheduled_calendar_status=AVAILABLE`; and `event_gate=CLEAR`. The command remained read-only and order submission remained disabled. Remote Desktop Commander is connected to `ai-cio-platform` as `tradebot`, so subsequent non-root deployment, testing, scans, and report inspections can run directly without asking the user to copy commands. Root/systemd changes still require an explicit protected action.
 
 Remaining external decisions still fail closed: authoritative scheduled Fed/economic calendar coverage; live AI CIO repository/View-link registration path and dashboard host/port; unsupported Alpaca products MRUT/MBTX; configured paper-comparison fee schedule.
 
