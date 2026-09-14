@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from option_bot.event_intelligence import (
@@ -95,3 +95,27 @@ def test_rss_rejects_missing_timestamp_instead_of_inventing_one() -> None:
 
     assert report["symbols"][0]["headline_gate"] == "UNAVAILABLE"
     assert report["symbols"][0]["headlines"] == []
+
+
+def test_stale_risk_headline_is_retained_but_cannot_block_today() -> None:
+    old = (NOW - timedelta(days=5)).astimezone(ZoneInfo("UTC"))
+    source = RssNewsSource(
+        "GOOGLE_NEWS",
+        lambda _symbol: "https://news.test/rss",
+        lambda _url: (
+            "<rss><channel><item>"
+            "<title>AAPL earnings warning</title>"
+            "<link>https://example.test/old</link>"
+            f"<pubDate>{old.strftime('%a, %d %b %Y %H:%M:%S GMT')}</pubDate>"
+            "</item></channel></rss>"
+        ).encode(),
+    )
+    report = build_event_intelligence_report(
+        symbols=("AAPL",), sources=(source,), retrieved_at=NOW
+    )
+
+    symbol = report["symbols"][0]
+    assert symbol["headline_gate"] == "CLEAR"
+    assert symbol["headline_count"] == 1
+    assert symbol["actionable_headline_count"] == 0
+    assert symbol["headlines"][0]["freshness"] == "STALE"

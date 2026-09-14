@@ -12,6 +12,8 @@ from zoneinfo import ZoneInfo
 
 
 ET = ZoneInfo("America/New_York")
+MAX_HEADLINE_AGE_MINUTES = 72 * 60
+FUTURE_TIMESTAMP_TOLERANCE_MINUTES = 5
 RISK_TERMS = {
     "EARNINGS": ("earnings", "guidance", "quarterly results"),
     "MERGER_ACQUISITION": ("merger", "acquisition", "takeover", "acquire"),
@@ -105,6 +107,14 @@ def _normalized(
     published: datetime,
     retrieved_at: datetime,
 ) -> Mapping[str, Any]:
+    if published.tzinfo is None or retrieved_at.tzinfo is None:
+        raise ValueError("headline and retrieval timestamps must be timezone-aware")
+    age_minutes = int((retrieved_at.astimezone(timezone.utc) - published.astimezone(timezone.utc)).total_seconds() // 60)
+    freshness = (
+        "FRESH"
+        if -FUTURE_TIMESTAMP_TOLERANCE_MINUTES <= age_minutes <= MAX_HEADLINE_AGE_MINUTES
+        else ("FUTURE" if age_minutes < -FUTURE_TIMESTAMP_TOLERANCE_MINUTES else "STALE")
+    )
     return {
         "title": title.strip(),
         "url": url.strip(),
@@ -112,6 +122,8 @@ def _normalized(
         "retrieved_at_et": _iso_et(retrieved_at),
         "symbol": symbol,
         "category": _category(title),
+        "age_minutes": age_minutes,
+        "freshness": freshness,
         "sources": [source],
     }
 
@@ -149,19 +161,24 @@ def build_event_intelligence_report(
                 statuses[source.name] = "UNAVAILABLE"
         headlines = _deduplicate(collected)
         available = any(status == "AVAILABLE" for status in statuses.values())
-        risk = any(item["category"] != "GENERAL_NEWS" for item in headlines)
+        actionable = [item for item in headlines if item["freshness"] == "FRESH"]
+        risk = any(item["category"] != "GENERAL_NEWS" for item in actionable)
         headline_gate = "BLOCKED" if risk else ("CLEAR" if available else "UNAVAILABLE")
         reasons = []
         if risk:
             reasons.append("RISK_HEADLINE_REQUIRES_REVIEW")
         if not available:
             reasons.append("HEADLINE_SOURCES_UNAVAILABLE")
+        elif any(status == "UNAVAILABLE" for status in statuses.values()):
+            reasons.append("PARTIAL_HEADLINE_SOURCES_UNAVAILABLE")
         symbol_reports.append(
             {
                 "symbol": symbol,
                 "headline_gate": headline_gate,
                 "source_status": statuses,
                 "headlines": headlines,
+                "headline_count": len(headlines),
+                "actionable_headline_count": len(actionable),
                 "reason_codes": reasons,
             }
         )
