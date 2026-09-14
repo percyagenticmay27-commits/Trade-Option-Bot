@@ -48,14 +48,28 @@ Wheel strategies are reserved for a later, separately governed `WHEEL_OPTIONS` e
 - Task 3 — fail-closed Alpaca market-data, paper-broker, normalization, and event-provider boundaries
 - Task 4 — indicators, versioned evidence scoring, and deterministic Day-1 Experience Learner
 - Task 5 — structure enumeration, governed delta ladder, probability contracts, and expected-value delta optimizer
+- Task 6 — durable audit ledger, conservative fill model, and position lifecycle
 
-Current completion: **50% of the 10-task Version 1 implementation plan**.
+Current completion: **60% of the 10-task Version 1 implementation plan**.
 
 ## Current stopping point
 
-Task 5 is complete. The focused Task 5 suite has 10 passing tests, the entire repository has 62 passing tests, `git diff --check` passes, and the source scan contains no doubled-delta touch-probability shortcut.
+Task 6 is complete. The focused Task 6 suite has 13 passing tests, the entire repository has 75 passing tests, `git diff --check` passes, and the live-trading/secret safety scan returns no matches.
 
-The next work item is **Task 6: Add durable audit ledger, conservative fill model, and position lifecycle**. Start by reading the Task 6 section of the implementation plan. Add its failing tests before production code.
+The next work item is **Task 7: Orchestrate daily scanning, portfolio selection, and shadow learning**. Start by reading the Task 7 section of the implementation plan. Add its failing tests before production code.
+
+## Important Task 6 behavior
+
+- SQLite audit records are append-oriented and written inside transactions.
+- Each record type uses a unique idempotency key so process restarts do not duplicate records.
+- Corrections append new records and reference the superseded record; history is not overwritten.
+- Records retain canonical payloads, configuration/model hashes, source timestamps, and full rejected-delta evidence.
+- The paper fill model never assumes a midpoint fill.
+- A fill occurs only when the complete multi-leg natural market reaches the limit; improvement cannot exceed midpoint.
+- An incomplete multi-leg quote is rejected and an unfilled entry expires after 10:30 ET.
+- Open positions exit for profit, thesis failure, underlying invalidation, 50% of maximum possible loss, daily stop, or the 15:30 ET mandatory exit.
+- Missing option data creates `DEGRADE`, never zero P&L or a false successful exit.
+- Underlying invalidation remains active while option valuation is degraded.
 
 ## Important Task 5 behavior
 
@@ -75,13 +89,12 @@ The next work item is **Task 6: Add durable audit ledger, conservative fill mode
 
 ```bash
 cd /workspace/scratch/cb8984e0c503/Trade-Option-Bot
-.venv/bin/pytest tests/test_probability.py tests/test_structures.py tests/test_delta_optimizer.py -q
-rg -n '2\s*\*\s*(abs\()?delta|delta\s*\*\s*2' src/option_bot
+.venv/bin/pytest tests/test_storage.py tests/test_fills.py tests/test_positions.py -q
 .venv/bin/pytest -q
 git status --short
 ```
 
-Expected at this checkpoint: 10 focused tests and 62 full-suite tests pass; the `rg` command returns no matches.
+Expected at this checkpoint: 13 focused tests and 75 full-suite tests pass.
 
 ## Git and safety notes
 
