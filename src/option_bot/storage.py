@@ -46,6 +46,13 @@ class AuditRepository:
     def count(self, record_type: str) -> int:
         return int(self._connection.execute("SELECT COUNT(*) FROM audit_records WHERE record_type=?", (record_type,)).fetchone()[0])
 
+    def find(self, record_type: str, key: str) -> dict[str, Any] | None:
+        row = self._connection.execute(
+            "SELECT id FROM audit_records WHERE record_type=? AND idempotency_key=?",
+            (record_type, key),
+        ).fetchone()
+        return self.get(int(row["id"])) if row else None
+
     def record_cycle(self, key, payload, config_hash, model_hash, source_time, supersedes_id=None):
         return self._record("cycle", key, payload, config_hash, model_hash, source_time, supersedes_id)
 

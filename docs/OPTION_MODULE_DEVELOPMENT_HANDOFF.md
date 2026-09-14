@@ -49,14 +49,29 @@ Wheel strategies are reserved for a later, separately governed `WHEEL_OPTIONS` e
 - Task 4 — indicators, versioned evidence scoring, and deterministic Day-1 Experience Learner
 - Task 5 — structure enumeration, governed delta ladder, probability contracts, and expected-value delta optimizer
 - Task 6 — durable audit ledger, conservative fill model, and position lifecycle
+- Task 7 — deterministic daily orchestration, portfolio selection, and isolated shadow learning
 
-Current completion: **60% of the 10-task Version 1 implementation plan**.
+Current completion: **70% of the 10-task Version 1 implementation plan**.
 
 ## Current stopping point
 
-Task 6 is complete. The focused Task 6 suite has 13 passing tests, the entire repository has 75 passing tests, `git diff --check` passes, and the live-trading/secret safety scan returns no matches.
+Task 7 is complete. The focused Task 7 suite has 11 passing tests, the entire repository has 86 passing tests, and `git diff --check` passes.
 
-The next work item is **Task 7: Orchestrate daily scanning, portfolio selection, and shadow learning**. Start by reading the Task 7 section of the implementation plan. Add its failing tests before production code.
+The next work item is **Task 8: Build reports and the standalone executive dashboard**. Start by reading the Task 8 section of the implementation plan. Add its failing tests before production code.
+
+## Important Task 7 behavior
+
+- Every entry-window cycle produces the governed 12-symbol leaderboard in stable ordering.
+- Provider failure produces `DATA_UNAVAILABLE` evidence for every affected symbol instead of a manufactured candidate.
+- Market-closed and pre-entry cycles do not select trades.
+- Cycles after 10:30 ET switch to management mode; 15:30 ET emits the mandatory-exit window.
+- Portfolio selection allows zero, one, or two candidates and honors the $200 daily aggregate loss ceiling.
+- The best neutral candidate is considered alongside the best qualified directional candidate.
+- Same-exposure candidates are rejected with `CORRELATED_EXPOSURE` unless a documented justification flag is present.
+- Cycle records are persisted before paper submission and duplicate cycle IDs are idempotent across process restarts.
+- Shadow predictions are stored but cannot alter active scores.
+- Shadow promotion cannot be enabled by runtime configuration; it requires offline proof and a code release.
+- CLI defaults to the read-only `health` command; state-changing paper operations require explicit commands.
 
 ## Important Task 6 behavior
 
@@ -89,12 +104,12 @@ The next work item is **Task 7: Orchestrate daily scanning, portfolio selection,
 
 ```bash
 cd /workspace/scratch/cb8984e0c503/Trade-Option-Bot
-.venv/bin/pytest tests/test_storage.py tests/test_fills.py tests/test_positions.py -q
+.venv/bin/pytest tests/test_orchestrator.py tests/test_portfolio.py tests/test_shadow.py -q
 .venv/bin/pytest -q
 git status --short
 ```
 
-Expected at this checkpoint: 13 focused tests and 75 full-suite tests pass.
+Expected at this checkpoint: 11 focused tests and 86 full-suite tests pass.
 
 ## Git and safety notes
 
