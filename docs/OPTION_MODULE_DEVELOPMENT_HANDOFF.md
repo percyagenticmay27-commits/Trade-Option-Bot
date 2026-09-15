@@ -153,3 +153,10 @@ Expected at this checkpoint: 115 full-suite tests pass.
 ## Git and safety notes
 
 The shell checkout cannot authenticate directly to the private GitHub repository. Previous tasks were committed locally and mirrored to the GitHub feature branch through the connected GitHub plugin by creating a full tree, creating a commit whose parent is the prior remote feature-branch commit, and advancing the branch ref without force. Do not overwrite `main`, force-update the branch, or include credentials.
+
+
+## 2026-09-15 morning scan correction
+
+The deployed timer invoked an advertised `scan-once` command that had no CLI implementation, so all four morning attempts fell through with exit code 2 before producing current reports. The command now validates the protected paper-only configuration and publishes the complete current-date 12-symbol report bundle with `order_submission_enabled=false`. Missing runtime evaluation evidence remains `DATA_UNAVAILABLE`/PENDING; no trade is fabricated and no order submitter is invoked.
+
+TDD evidence: the public CLI test first failed with `scan-once: requires configured paper-only runtime`, then passed unchanged after the implementation. The full Option suite passes (130 tests). A deployed 2026-09-15 invocation produced current summary and leaderboard artifacts with paper-only true, order submission false, health PENDING, and zero selected trades.
