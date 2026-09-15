@@ -237,6 +237,7 @@ def build_scan_report(
     unavailable = sum(row["decision"] == Decision.DATA_UNAVAILABLE.value for row in rows)
     summary = {
         "paper_only": True, "module_id": "OPTION-001", "strategy_type": "0DTE_OPTIONS",
+        "order_submission_enabled": False,
         "trade_date": trade_date, "market_session": "CURRENT",
         "best_neutral": next((row["symbol"] for row in rows if row["structure"] in {"IRON_CONDOR", "IRON_BUTTERFLY"}), None),
         "best_directional": next((row["symbol"] for row in rows if row["structure"] in {"PUT_CREDIT_SPREAD", "CALL_CREDIT_SPREAD"}), None),
@@ -244,12 +245,12 @@ def build_scan_report(
         "health": "PENDING" if unavailable == len(rows) else ("DEGRADED" if unavailable else "HEALTHY"),
         "rejected_candidates": [row for row in rows if row["decision"] == Decision.NO_TRADE.value],
     }
-    positions = {"paper_only": True, "trade_date": trade_date, "selected": selected, "open": [], "completed": []}
-    experience = {"paper_only": True, "trade_date": trade_date, "mode": "SHADOW_ONLY", "ranking_influence": False, "symbols": []}
+    positions = {"paper_only": True, "order_submission_enabled": False, "trade_date": trade_date, "selected": selected, "open": [], "completed": []}
+    experience = {"paper_only": True, "order_submission_enabled": False, "trade_date": trade_date, "mode": "SHADOW_ONLY", "ranking_influence": False, "symbols": []}
     bundle = ReportBundle(summary, rows, positions, experience)
     output_dir.mkdir(parents=True, exist_ok=True)
     _write(output_dir / "option_001_summary.json", summary)
-    _write(output_dir / "option_001_leaderboard.json", {"paper_only": True, "trade_date": trade_date, "leaderboard": rows})
+    _write(output_dir / "option_001_leaderboard.json", {"paper_only": True, "order_submission_enabled": False, "trade_date": trade_date, "leaderboard": rows})
     _write(output_dir / "option_001_positions.json", positions)
     _write(output_dir / "option_001_experience.json", experience)
     if render:
