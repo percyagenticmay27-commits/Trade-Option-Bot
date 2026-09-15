@@ -30,7 +30,7 @@ class ReportBuilder:
             "evidence_id": f"{trade_date}:{symbol}",
         } for index, symbol in enumerate(REQUIRED_SYMBOLS, 1)]
         summary = {
-            "paper_only": True, "module_id": "OPTION-001", "strategy_type": "0DTE_OPTIONS",
+            "paper_only": True, "order_submission_enabled": False,\n            "module_id": "OPTION-001", "strategy_type": "0DTE_OPTIONS",
             "trade_date": trade_date, "market_session": "Not available",
             "best_neutral": None, "best_directional": None,
             "selected_count": 0, "open_count": 0, "completed_count": 0,
