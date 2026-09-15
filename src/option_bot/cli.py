@@ -96,6 +96,17 @@ def main(argv: list[str] | None = None) -> int:
         ReportBuilder(Path(args.output_dir)).build(args.fixture_date)
         print(f"OPTION-001 paper reports rendered to {args.output_dir}")
         return 0
+    if command == "scan-once":
+        try:
+            OptionBotConfig.load(os.environ, Path(args.config))
+            trade_date = args.trade_date or datetime.now(ET).date().isoformat()
+            from option_bot.reporting import ReportBuilder
+            ReportBuilder(Path(args.output_dir)).build(trade_date)
+            print(f"OPTION-001 paper scan report written for {trade_date}: {args.output_dir}")
+            return 0
+        except (ConfigError, OSError, ValueError, json.JSONDecodeError) as exc:
+            print(json.dumps({"status": "DATA_UNAVAILABLE", "paper_only": True, "detail": str(exc)}, sort_keys=True))
+            return 2
     if command == "coverage-once":
         try:
             config = OptionBotConfig.load(os.environ, Path(args.config))
