@@ -14,7 +14,7 @@ from option_bot.config import ConfigError, OptionBotConfig
 from option_bot.coverage import build_coverage_report
 from option_bot.evidence import EvidenceEngine
 from option_bot.event_intelligence import AlphaVantageNewsSource, RssNewsSource, build_event_intelligence_report
-from option_bot.live_scan import build_scan_report, evaluate_live_scan
+from option_bot.live_scan import EvaluatedSetup, build_scan_report, evaluate_live_scan
 from option_bot.providers.http import PublicHttpClient, build_json_transport
 from option_bot.scheduled_events import (
     BEA_URL,
@@ -160,17 +160,20 @@ def main(argv: list[str] | None = None) -> int:
             config = OptionBotConfig.load(os.environ, Path(args.config))
             as_of = datetime.now(ET)
             trade_date = args.trade_date or as_of.date().isoformat()
-            paper = build_json_transport(config.alpaca_base_url, config.alpaca_key_id, config.alpaca_secret_key)
-            market = build_json_transport(DATA_BASE_URL, config.alpaca_key_id, config.alpaca_secret_key)
-            events = _event_report(config, as_of)
-            model_path = Path("configs/evidence-model-v1.json")
-            model = json.loads(model_path.read_text(encoding="utf-8"))
-            evaluations = evaluate_live_scan(
-                symbols=config.symbols, trade_date=trade_date, as_of=as_of,
-                paper_transport=paper, market_transport=market, event_report=events,
-                evidence_engine=EvidenceEngine.from_file(model_path), max_loss=config.max_loss_per_trade,
-                trade_threshold=int(model["trade_threshold"]), watch_threshold=int(model["watch_threshold"]),
-            )
+            if not os.environ.get("ALPHA_VANTAGE_API_KEY"):
+                evaluations = tuple(EvaluatedSetup.unavailable(symbol, ("EVENT_GATE_UNAVAILABLE",)) for symbol in config.symbols)
+            else:
+                paper = build_json_transport(config.alpaca_base_url, config.alpaca_key_id, config.alpaca_secret_key)
+                market = build_json_transport(DATA_BASE_URL, config.alpaca_key_id, config.alpaca_secret_key)
+                events = _event_report(config, as_of)
+                model_path = Path("configs/evidence-model-v1.json")
+                model = json.loads(model_path.read_text(encoding="utf-8"))
+                evaluations = evaluate_live_scan(
+                    symbols=config.symbols, trade_date=trade_date, as_of=as_of,
+                    paper_transport=paper, market_transport=market, event_report=events,
+                    evidence_engine=EvidenceEngine.from_file(model_path), max_loss=config.max_loss_per_trade,
+                    trade_threshold=int(model["trade_threshold"]), watch_threshold=int(model["watch_threshold"]),
+                )
             bundle = build_scan_report(trade_date=trade_date, symbols=config.symbols, evaluations=evaluations, output_dir=Path(args.output_dir))
             print(f"OPTION-001 evaluated {len(evaluations)} governed symbols; selected {bundle.summary['selected_count']}: {args.output_dir}/option_001_leaderboard.json")
             return 0
