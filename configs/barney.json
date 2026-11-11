@@ -1,0 +1,51 @@
+{
+  "name": "Barney",
+  "role": "OPTION_001_PAPER_SPREAD_GUARDIAN",
+  "status": "IMPLEMENTED_NOT_ACTIVATED",
+  "activation_blocker": "SYSTEMD_INSTALL_AND_LIVE_HELD_CONTRACT_VERIFICATION",
+  "paper_only": true,
+  "order_submission_enabled": false,
+  "entry_authority": false,
+  "exit_authority": "EXISTING_LOCAL_PAPER_MANAGER_RULES_ONLY",
+  "quote_source": "ALPACA_MARKET_DATA",
+  "target_observation_interval_seconds": 30,
+  "max_quote_age_seconds": 60,
+  "collection_scope": "OPEN_PAPER_LEG_UUIDS_ONLY",
+  "empty_ledger_action": "IDLE_NO_MARKET_REQUESTS",
+  "management_command": "manage-once",
+  "mandatory_exit_et": "15:30",
+  "exits": {
+    "credit_capture_fraction": "0.50",
+    "maximum_loss_fraction": "0.50",
+    "debit_maximum_profit_fraction": "0.50"
+  },
+  "technical_reversal_policy": "SHADOW_RESEARCH_ONLY_NOT_EXIT_AUTHORITY",
+  "leg_removal_allowed": false,
+  "broker_orders_allowed": false,
+  "observation_log": "results/position_observations/YYYY-MM-DD.jsonl",
+  "schedule_installed": false,
+  "defensive_strategy": {
+    "id": "EXPERIMENTAL_OPPOSITE_CREDIT_IRON_CONDOR_V1",
+    "paper_only": true,
+    "enabled_in_local_paper_manager": true,
+    "independent_barney_service_activated": false,
+    "ordinary_new_entry_cutoff_ct": "11:00",
+    "defensive_window_ct": "10:00\u201312:30 (exclusive)",
+    "floating_loss_warning_fraction_of_original_max_risk": "0.20",
+    "existing_stop_fraction_of_max_risk": "0.50",
+    "eligible_structures": [
+      "CALL_CREDIT_SPREAD",
+      "PUT_CREDIT_SPREAD"
+    ],
+    "opposite_short_max_abs_delta": "0.20",
+    "minimum_additional_natural_credit": "0.10",
+    "maximum_adjustments_per_position": 1,
+    "maximum_adjusted_defined_risk": "NO_GREATER_THAN_ORIGINAL_OR_CONFIGURED_LIMIT",
+    "must_verify_all_four_leg_quotes": true,
+    "requires_fresh_connector_opposite_side_contracts": true,
+    "no_adjustment_if_stop_already_triggered": true,
+    "do_not_change_original_exit_policy": true,
+    "live_broker_order_submission": false,
+    "performance_event": "PAPER_DEFENSIVE_ADJUST"
+  }
+}
