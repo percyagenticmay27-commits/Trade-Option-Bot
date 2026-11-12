@@ -29,7 +29,7 @@ if [[ "$COMMAND" == "scan-once" ]]; then
   WAIT_RC=$?
   set -e
   if [[ "$WAIT_RC" == "10" ]]; then
-    exec "$APP_ROOT/scripts/run_option_bot.sh" manage-once
+    SHADOW_EARLY_ENTRY_SCAN=1 exec "$APP_ROOT/scripts/run_option_bot.sh" manage-once
   fi
   if ! "$APP_ROOT/.venv/bin/python" -m option_bot.research_gate \
       "$ROBINHOOD_RESEARCH_SNAPSHOT_PATH" --max-age-seconds 60; then
