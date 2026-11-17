@@ -24,6 +24,7 @@ def main():
     history=rows(args.history);current=rows(args.current_bars)
     plans={}
     shadow={}
+    opening={}
     for symbol in args.symbols:
         proxy={"SPX":"SPY","XSP":"SPY","DJX":"DIA","MRUT":"IWM"}.get(symbol,symbol)
         merged={b["begins_at"]:b for r in history+current if r["symbol"]==proxy for b in r["bars"]}
@@ -44,6 +45,11 @@ def main():
                 shadow[symbol]={"strategy":"EARLY_REVERSAL_EMA9_20_SHADOW",
                     "status":"DATA_UNAVAILABLE","reason":"CURRENT_COMPLETED_BARS_UNAVAILABLE",
                     "paper_only":True,"paper_entries":0,"broker_submissions":0}
+        if symbol in {'SPX','XSP'}:
+            from option_bot.opening_range_shadow import evaluate as evaluate_opening
+            opening[symbol]=evaluate_opening(symbol,indicators,bars,as_of) if indicators is not None else {
+                'strategy':'OPENING_RANGE_VWAP_REGIME_SHADOW_V1','status':'DATA_UNAVAILABLE',
+                'reason':'CURRENT_COMPLETED_BARS_UNAVAILABLE','candidate_option_types':[]}
         plan=collection_plan(indicators) if fresh else {
             "status":"DATA_UNAVAILABLE","bias":None,"candidate_option_types":[],
             "reason":"CURRENT_COMPLETED_BARS_UNAVAILABLE","directional_debit_enabled":False}
@@ -69,6 +75,10 @@ def main():
     _atomic(Path(args.output).with_name('option_001_early_reversal_shadow.json'),
             {'generated_at_et':as_of.isoformat(),'mode':'SHADOW_OBSERVATION_ONLY',
              'results':shadow,'paper_entries':0,'broker_submissions':0})
+    _atomic(Path(args.output).with_name('option_001_opening_range_shadow_plan.json'),
+            json.loads(json.dumps({'generated_at_et':as_of.isoformat(),
+                'strategy':'OPENING_RANGE_VWAP_REGIME_SHADOW_V1','research_only':True,
+                'order_submission_enabled':False,'symbols':opening},default=str)))
     print(json.dumps({s:{"status":v["status"],"bias":v["bias"],"candidate_option_types":v["candidate_option_types"]} for s,v in plans.items()}))
     # A complete, non-stale price observation with contradictory VWAP/EMA50
     # is a trading WAIT, not a provider refresh failure. Other missing

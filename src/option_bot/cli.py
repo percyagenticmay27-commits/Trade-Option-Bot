@@ -207,6 +207,15 @@ def main(argv: list[str] | None = None) -> int:
             except (OSError,ValueError,TypeError,KeyError,ArithmeticError) as exc:
                 print(json.dumps({"shadow_status":"DATA_UNAVAILABLE","shadow_reason":str(exc),
                      "paper_only":True,"broker_submissions":0}))
+            try:
+                from option_bot.opening_range_shadow_cycle import run_cycle as run_opening_range
+                run_opening_range(config,Path(args.output_dir),as_of,
+                    allow_entries=command=='manage-once' and os.environ.get('SHADOW_EARLY_ENTRY_SCAN')=='1',
+                    events=json.loads((Path(args.output_dir)/'option_001_scan_events.json').read_text())
+                    if (Path(args.output_dir)/'option_001_scan_events.json').exists() else {})
+            except (OSError,ValueError,TypeError,KeyError,ArithmeticError) as exc:
+                print(json.dumps({'opening_range_shadow_status':'DATA_UNAVAILABLE',
+                    'reason':str(exc),'paper_only':True,'broker_submissions':0}))
             refresh_paper_reports(Path(args.output_dir), result)
             if result["paper_execution_status"] == "DEGRADED":
                 request_refresh(args.output_dir, command, "HELD_LEG_QUOTES_REQUIRED")
@@ -270,6 +279,12 @@ def main(argv: list[str] | None = None) -> int:
             except (OSError,ValueError,TypeError,KeyError,ArithmeticError) as exc:
                 print(json.dumps({"shadow_status":"DATA_UNAVAILABLE","shadow_reason":str(exc),
                       "paper_only":True,"broker_submissions":0}))
+            try:
+                from option_bot.opening_range_shadow_cycle import run_cycle as run_opening_range
+                run_opening_range(config,Path(args.output_dir),as_of,allow_entries=True,events=events)
+            except (OSError,ValueError,TypeError,KeyError,ArithmeticError) as exc:
+                print(json.dumps({'opening_range_shadow_status':'DATA_UNAVAILABLE',
+                    'reason':str(exc),'paper_only':True,'broker_submissions':0}))
             bundle = build_scan_report(
                 trade_date=trade_date, symbols=config.symbols, evaluations=evaluations,
                 output_dir=Path(args.output_dir),
