@@ -1,0 +1,16 @@
+[Unit]
+Description=Barney post-session EOD 0DTE cash-expiry reconciliation with retries
+
+[Timer]
+# 13:02 ET handles authorized early sessions; 16:02 regular sessions.
+# Further passes retry delayed Cboe publication without faking settlement.
+OnCalendar=Mon..Fri *-*-* 13:02:00 America/New_York
+OnCalendar=Mon..Fri *-*-* 16:02:00 America/New_York
+OnCalendar=Mon..Fri *-*-* 16:20:00 America/New_York
+OnCalendar=Mon..Fri *-*-* 17:05:00 America/New_York
+AccuracySec=10s
+Persistent=true
+Unit=barney-post-session.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,18 @@
+[Unit]
+Description=Barney 0DTE post-session paper expiry reconciliation and EOD report
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/tradebot/Trade-Option-Bot
+EnvironmentFile=/etc/trade-option-bot.env
+Environment=OPTION_BOT_TIMEZONE=America/New_York
+Environment=PYTHONPATH=/home/tradebot/Trade-Option-Bot/src
+ExecStart=/home/tradebot/Trade-Option-Bot/.venv/bin/python /home/tradebot/Trade-Option-Bot/scripts/barney_post_session.py
+TimeoutStartSec=150
+NoNewPrivileges=true
+UMask=0077
+
+[Install]
+WantedBy=default.target
